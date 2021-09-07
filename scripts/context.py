@@ -16,12 +16,8 @@ from pathlib import Path
 path = Path(__file__).resolve()  # this file
 this_dir = path.parent  # this folder
 notebooks_dir = this_dir
-root_dir = notebooks_dir.parents[1]
+root_dir = notebooks_dir.parents[0]
 data_dir = root_dir / Path("data")
-tzone_dir = root_dir / Path("data/tzone/")
-xr_dir = root_dir / Path("data/xr/")
-nc_dir = root_dir / Path("data/nc/")
-
 wrf_dir = Path("/Volumes/GoogleDrive/Shared drives/WAN00CG-01/")
 
 sys.path.insert(0, str(root_dir))

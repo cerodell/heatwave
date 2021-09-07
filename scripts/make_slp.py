@@ -47,9 +47,7 @@ class ShadedReliefESRI(GoogleTiles):
 
 
 domain = "d03"
-ds = xr.open_dataset(
-    str(data_dir) + f"/heatwave/wrfout_{domain}_2021062506_2021070100.nc"
-)
+ds = xr.open_dataset(str(data_dir) + f"/wrfout_{domain}_2021062506_2021070100.nc")
 
 
 gog_dir = "/Volumes/GoogleDrive/Shared drives/WAN00CG-01/21071900"
@@ -57,7 +55,7 @@ ncfile = Dataset(str(gog_dir) + f"/wrfout_{domain}_2021-07-20_21:00:00")
 
 
 ### Open color map json
-with open(str(data_dir) + "/json/colormaps-hw.json") as f:
+with open(str(data_dir) + "/colormaps-hw.json") as f:
     cmaps = json.load(f)
 
 var, index = "T", 18
@@ -93,7 +91,7 @@ intitalized_fghi = datetime.strptime(str(intitalized_fghi), "%Y-%m-%dT%H").strft
 
 # ty1, ty2 = 0, 402
 tx1, tx2 = 0, -200
-ty1,ty2 = 0, -1
+ty1, ty2 = 0, -1
 # tx1, tx2 = 0, -1
 levels = np.arange(0, 46.5, 0.5)
 skip = 8
@@ -152,9 +150,7 @@ ind_high = np.unravel_index(
 )
 
 ind_low = np.unravel_index(
-    np.argmin(
-        np.where((lons < -123.8) & (lats < 45), smooth_slp, 99999), axis=None
-    ),
+    np.argmin(np.where((lons < -123.8) & (lats < 45), smooth_slp, 99999), axis=None),
     smooth_slp.shape,
 )
 
@@ -262,7 +258,7 @@ plt.figtext(
     "Temperature at 2m ($^\circ$C)  \nSea Level Pressure (hPa) \n10m Wind (full barb = 10$km\,h^{-1}$)",
     fontsize=11,
 )
-plt.savefig('/Users/rodell/Desktop/sample3.png', dpi = 250)
+# plt.savefig('/Users/rodell/Desktop/sample3.png', dpi = 250)
 
 # # Create a figure
 # fig = plt.figure(figsize=(14, 10))
