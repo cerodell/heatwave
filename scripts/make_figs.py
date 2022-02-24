@@ -32,7 +32,14 @@ from context import wrf_dir, data_dir
 from cartopy.io.img_tiles import GoogleTiles
 import warnings
 
+data_dir = "/Volumes/cer/heatwave/data"
+
 warnings.simplefilter("ignore")
+
+lats_study = np.arange(45, 52 + 0.1, 0.1)
+lons_study = np.arange(-123.25, -119 + 0.1, 0.1)
+## mesh for ploting...could do without
+lons_study, lats_study = np.meshgrid(lons_study, lats_study)
 
 
 class ShadedReliefESRI(GoogleTiles):
@@ -47,12 +54,10 @@ class ShadedReliefESRI(GoogleTiles):
 
 
 domain = "d03"
-ds = xr.open_dataset(
-    str(data_dir) + f"/heatwave/wrfout_{domain}_2021062506_2021070100.nc"
-)
+ds = xr.open_dataset(str(data_dir) + f"/wrfout_{domain}_2021062506_2021070100.nc")
 
 ### Open color map json
-with open(str(data_dir) + "/json/colormaps-hw.json") as f:
+with open(str(data_dir) + "/colormaps-hw.json") as f:
     cmaps = json.load(f)
 
 var, index = "T", 18
@@ -91,7 +96,7 @@ tx1, tx2 = 44, -200
 # ty1,ty2 = 0, -1
 # tx1, tx2 = 0, -1
 levels = np.arange(0, 46.5, 0.5)
-skip = 8
+skip = 11
 cmap = LinearSegmentedColormap.from_list("meteoblue", colors, N=len(levels))
 lats, lons = ds.XLAT.values[ty1:ty2, tx1:tx2], ds.XLONG.values[ty1:ty2, tx1:tx2]
 # Download and add the states and coastlines
@@ -135,7 +140,7 @@ for i in range(1, 10):
     )
     ds1 = ds.isel(Time=10 + i)
     slp = ds1.slp
-    smooth_slp = smooth2d(slp, 3, cenweight=4)
+    smooth_slp = smooth2d(slp, 400, cenweight=4)
     smooth_slp = smooth_slp.values[ty1:ty2, tx1:tx2]
     wsp = ds1.wspd_wdir10.values[ty1:ty2, tx1:tx2]
 
@@ -258,20 +263,47 @@ for i in range(1, 10):
         alpha=0.9,
     )
 
-    ax.barbs(
+    # ax.barbs(
+    #     lons[::skip, ::skip],
+    #     lats[::skip, ::skip],
+    #     u10[::skip, ::skip],
+    #     v10[::skip, ::skip],
+    #     length=3,
+    #     zorder=8,
+    #     lw=0.4,
+    # )
+
+    widths = np.linspace(0, 10, u10[::skip, ::skip].size)
+    ax.quiver(
         lons[::skip, ::skip],
         lats[::skip, ::skip],
         u10[::skip, ::skip],
         v10[::skip, ::skip],
-        length=3,
         zorder=8,
-        lw=0.4,
+        lw=widths,
     )
 
     # # Set the map bounds
     ax.set_xlim([-130, -114])
     ax.set_ylim([43.2, 55.5])
     # Add the gridlines
+    color = "black"
+    ax.plot(lons_study[0], lats_study[0], color=color, linewidth=2, zorder=10, alpha=1)
+    ax.plot(
+        lons_study[-1].T, lats_study[-1].T, color=color, linewidth=2, zorder=10, alpha=1
+    )
+    ax.plot(
+        lons_study[:, 0], lats_study[:, 0], color=color, linewidth=2, zorder=10, alpha=1
+    )
+    ax.plot(
+        lons_study[:, -1].T,
+        lats_study[:, -1].T,
+        color=color,
+        linewidth=2,
+        zorder=10,
+        alpha=1,
+        label="Study Area",
+    )
 
     if i == 1:
         print(i)
@@ -286,7 +318,8 @@ for i in range(1, 10):
         gl.top_labels = False
         gl.bottom_labels = False
         gl.right_labels = False
-        gl.xlocator = mticker.FixedLocator(list(np.arange(-180, 180, 2)))
+        gl.xlocator = mticker.FixedLocator(list(np.arange(-180, 180, 4)))
+
     elif i == 4:
         print(i)
         gl = ax.gridlines(
@@ -300,8 +333,8 @@ for i in range(1, 10):
         gl.top_labels = False
         gl.bottom_labels = False
         gl.right_labels = False
+        gl.xlocator = mticker.FixedLocator(list(np.arange(-180, 180, 4)))
 
-        gl.xlocator = mticker.FixedLocator(list(np.arange(-180, 180, 2)))
     elif i == 7:
         print(i)
         gl = ax.gridlines(
@@ -316,7 +349,8 @@ for i in range(1, 10):
         gl.right_labels = False
         gl.left_labels = True
         gl.bottom_labels = True
-        gl.xlocator = mticker.FixedLocator(list(np.arange(-180, 180, 3)))
+        gl.xlocator = mticker.FixedLocator(list(np.arange(-180, 180, 4)))
+
     elif i == 8:
         print(i)
         gl = ax.gridlines(
@@ -331,7 +365,8 @@ for i in range(1, 10):
         gl.right_labels = False
         gl.left_labels = False
         gl.bottom_labels = True
-        gl.xlocator = mticker.FixedLocator(list(np.arange(-180, 180, 3)))
+        gl.xlocator = mticker.FixedLocator(list(np.arange(-180, 180, 4)))
+
     elif i == 9:
         print(i)
         gl = ax.gridlines(
@@ -346,7 +381,8 @@ for i in range(1, 10):
         gl.right_labels = False
         gl.left_labels = False
         gl.bottom_labels = True
-        gl.xlocator = mticker.FixedLocator(list(np.arange(-180, 180, 3)))
+        gl.xlocator = mticker.FixedLocator(list(np.arange(-180, 180, 4)))
+
     else:
         gl = ax.gridlines(
             draw_labels=False,
@@ -376,7 +412,8 @@ plt.figtext(0.1, 0.975, f"UBC WRF-NAM 4km Domain", fontsize=14)
 plt.figtext(
     0.1,
     0.9,
-    "Temperature at 2m ($^\circ$C)  \nSea Level Pressure (hPa) \n10m Wind (full barb = 10$km\,h^{-1}$)",
+    # "Temperature at 2m ($^\circ$C)  \nSea Level Pressure (hPa) \n10m Wind (full barb = 10$km\,h^{-1}$)",
+    "Temperature at 2m ($^\circ$C)  \nSea Level Pressure (hPa) \n10m Wind Vectors",
     fontsize=11,
 )
 
