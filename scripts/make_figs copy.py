@@ -261,8 +261,8 @@ for i in range(1, 10):
         zorder=8,
         lw=widths,
         # width = 0.5,
-        # headwidth = 9,
-        # headlength = 6
+        headwidth=9,
+        headlength=6,
     )
 
     # # Set the map bounds
@@ -413,7 +413,7 @@ plt.figtext(
 )
 
 plt.savefig(
-    str(root_dir) + f"/img/slp-final-multi-vectors-old.png",
+    str(root_dir) + f"/img/slp-final-multi-vectors.png",
     dpi=250,
     bbox_inches="tight",
 )
