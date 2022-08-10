@@ -42,15 +42,15 @@ lons_study = np.arange(-123.25, -119 + 0.1, 0.1)
 lons_study, lats_study = np.meshgrid(lons_study, lats_study)
 
 
-class ShadedReliefESRI(GoogleTiles):
-    # shaded relief
-    def _image_url(self, tile):
-        x, y, z = tile
-        url = (
-            "https://server.arcgisonline.com/ArcGIS/rest/services/"
-            "World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}.jpg"
-        ).format(z=z, y=y, x=x)
-        return url
+# class ShadedReliefESRI(GoogleTiles):
+#     # shaded relief
+#     def _image_url(self, tile):
+#         x, y, z = tile
+#         url = (
+#             "https://server.arcgisonline.com/ArcGIS/rest/services/"
+#             "World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}.jpg"
+#         ).format(z=z, y=y, x=x)
+#         return url
 
 
 domain = "d03"
@@ -69,9 +69,17 @@ name, colors, sigma = (
 )
 levels = cmaps[var]["levels"]
 
-colors = colors[-24:]
+# cools = colors[-28:-24] # cools
+# warms = colors[-12:-4]  # warms
+# colors = cools + warms + [colors[-1]]
+
+# warms = colors[-12:-4]  # warms
+# colors =  warms + [colors[-1]]
+colors = colors[-12:-1]
 
 
+# 00ef7c
+# d8f7a1
 # %%
 
 
@@ -95,8 +103,8 @@ ty1, ty2 = 0, 402
 tx1, tx2 = 44, -200
 # ty1,ty2 = 0, -1
 # tx1, tx2 = 0, -1
-levels = np.arange(0, 46.5, 0.5)
-skip = 12
+levels = np.arange(10, 46.5, 0.5)
+skip = 15
 cmap = LinearSegmentedColormap.from_list("meteoblue", colors, N=len(levels))
 lats, lons = ds.XLAT.values[ty1:ty2, tx1:tx2], ds.XLONG.values[ty1:ty2, tx1:tx2]
 # Download and add the states and coastlines
@@ -252,6 +260,9 @@ for i in range(1, 10):
         v10[::skip, ::skip],
         zorder=8,
         lw=widths,
+        # width = 0.5,
+        # headwidth = 9,
+        # headlength = 6
     )
 
     # # Set the map bounds
@@ -402,8 +413,10 @@ plt.figtext(
 )
 
 plt.savefig(
-    str(root_dir) + f"/img/slp-final-multi-vectors.png", dpi=250, bbox_inches="tight"
+    str(root_dir) + f"/img/slp-final-multi-vectors-old.png",
+    dpi=250,
+    bbox_inches="tight",
 )
 
-# plt.show()
+plt.show()
 # %%
